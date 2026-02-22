@@ -6,56 +6,9 @@
     <title>Live Roblox Follower Count</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/odometer.js/0.4.7/themes/odometer-theme-default.min.css">
 
     <style>
-        /* --- CSS ODOMETER (Inline) --- */
-        .odometer.odometer-auto-theme, .odometer.odometer-theme-default {
-            display: inline-block;
-            vertical-align: middle;
-            position: relative;
-            line-height: 1.1em;
-        }
-        .odometer.odometer-auto-theme .odometer-digit, .odometer.odometer-theme-default .odometer-digit {
-            display: inline-block;
-            vertical-align: middle;
-            position: relative;
-        }
-        .odometer.odometer-auto-theme .odometer-digit .odometer-digit-spacer, .odometer.odometer-theme-default .odometer-digit .odometer-digit-spacer {
-            display: inline-block;
-            vertical-align: middle;
-            visibility: hidden;
-        }
-        .odometer.odometer-auto-theme .odometer-digit .odometer-digit-inner, .odometer.odometer-theme-default .odometer-digit .odometer-digit-inner {
-            text-align: left;
-            display: block;
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            overflow: hidden;
-        }
-        .odometer.odometer-auto-theme .odometer-digit .odometer-ribbon, .odometer.odometer-theme-default .odometer-digit .odometer-ribbon {
-            display: block;
-        }
-        .odometer.odometer-auto-theme .odometer-digit .odometer-ribbon-inner, .odometer.odometer-theme-default .odometer-digit .odometer-ribbon-inner {
-            display: block;
-            -webkit-backface-visibility: hidden;
-        }
-        .odometer.odometer-auto-theme .odometer-digit .odometer-value, .odometer.odometer-theme-default .odometer-digit .odometer-value {
-            display: block;
-            -webkit-transform: translateZ(0);
-        }
-        .odometer.odometer-auto-theme .odometer-digit .odometer-value.odometer-last-value, .odometer.odometer-theme-default .odometer-digit .odometer-value.odometer-last-value {
-            position: absolute;
-        }
-        .odometer.odometer-auto-theme.odometer-animating-up.odometer-animating .odometer-ribbon-inner, .odometer.odometer-theme-default.odometer-animating-up.odometer-animating .odometer-ribbon-inner {
-            transition: transform 2s;
-            transform: translateY(-100%);
-        }
-        .odometer.odometer-auto-theme.odometer-animating-down.odometer-animating .odometer-ribbon-inner, .odometer.odometer-theme-default.odometer-animating-down.odometer-animating .odometer-ribbon-inner {
-            transition: transform 2s;
-            transform: translateY(0);
-        }
-
-        /* --- UI DESIGN --- */
         :root {
             --bg: #0f0f13;
             --accent: #0084ff;
@@ -73,7 +26,6 @@
             min-height: 100vh;
         }
 
-        /* Navbar */
         .navigation-bar {
             width: 100%;
             height: 70px;
@@ -105,7 +57,6 @@
             font-size: 0.9rem;
         }
 
-        /* Container & Card */
         .main-container {
             flex: 1;
             display: flex;
@@ -113,6 +64,7 @@
             align-items: center;
             width: 100%;
             padding: 20px;
+            box-sizing: border-box;
         }
 
         .counter-card {
@@ -144,12 +96,19 @@
             text-decoration: none;
         }
 
-        /* Odometer Mobile Friendly */
+        #status-msg {
+            font-size: 0.85rem;
+            color: #ff6b6b;
+            min-height: 20px;
+            margin: 5px 0;
+        }
+
         .odometer {
-            font-size: 5rem; /* Ukuran Desktop */
+            font-size: 5rem;
             font-weight: 800;
             margin: 20px 0;
             display: block;
+            color: white;
         }
 
         @media (max-width: 600px) {
@@ -158,7 +117,6 @@
             #title-text { font-size: 1.2rem; }
         }
 
-        /* Modal Pencarian Custom */
         #search-modal {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -187,8 +145,16 @@
             border-radius: 10px;
             color: white;
             font-size: 1rem;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             outline: none;
+            box-sizing: border-box;
+        }
+
+        #modal-error {
+            color: #ff6b6b;
+            font-size: 0.85rem;
+            min-height: 20px;
+            margin-bottom: 10px;
         }
 
         .modal-content button {
@@ -198,11 +164,11 @@
             border: none;
             font-weight: 700;
             cursor: pointer;
+            font-size: 1rem;
         }
 
         .btn-go { background: var(--accent); color: white; margin-bottom: 10px; }
         .btn-close { background: #444; color: white; }
-
     </style>
 </head>
 <body>
@@ -217,8 +183,9 @@
 
     <div class="main-container">
         <div class="counter-card">
-            <img id="thumbnail" src="https://tr.rbxcdn.com/38cda1368297750824b2049e63e72151/150/150/AvatarHeadshot/Png" alt="User thumbnail">
+            <img id="thumbnail" src="https://placehold.co/120x120/1a1a20/0084ff?text=..." alt="User thumbnail">
             <a id="title-text" target="_blank">Memuat...</a>
+            <div id="status-msg"></div>
             <div class="odometer" id="odometer">0</div>
             <p style="color: #888; letter-spacing: 2px; font-size: 0.8rem; font-weight: 600;">FOLLOWERS</p>
         </div>
@@ -227,97 +194,204 @@
     <div id="search-modal">
         <div class="modal-content">
             <h2 style="margin-top:0">Cari Username</h2>
-            <input type="text" id="usernameInput" placeholder="Masukkan username roblox...">
-            <button class="btn-go" onclick="searchUser()">CARI SEKARANG</button>
+            <input type="text" id="usernameInput" placeholder="Masukkan username roblox..." onkeydown="if(event.key==='Enter') searchUser()">
+            <div id="modal-error"></div>
+            <button class="btn-go" id="btn-go" onclick="searchUser()">CARI SEKARANG</button>
             <button class="btn-close" onclick="closeSearch()">BATAL</button>
         </div>
     </div>
 
-    <script>
-        // Paste-kan isi odometer.js di sini secara otomatis
-        // (Saya ringkas logikanya agar berfungsi langsung)
-    </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/odometer.js/0.4.7/odometer.min.js"></script>
 
     <script>
-        let currentUserId = "1"; // Default Roblox
-        let refreshInterval;
+        // Konfigurasi odometer
+        window.odometerOptions = { format: 'd', duration: 1500 };
 
-        // Fungsi Modal
-        function openSearch() { document.getElementById('search-modal').style.display = 'flex'; document.getElementById('usernameInput').focus(); }
-        function closeSearch() { document.getElementById('search-modal').style.display = 'none'; }
+        let currentUserId = null;
+        let refreshInterval = null;
 
-        // Cek URL Params saat start
+        function openSearch() {
+            document.getElementById('search-modal').style.display = 'flex';
+            document.getElementById('modal-error').textContent = '';
+            document.getElementById('usernameInput').focus();
+        }
+        function closeSearch() {
+            document.getElementById('search-modal').style.display = 'none';
+        }
+
+        // Cek URL params saat start
         const params = new URLSearchParams(window.location.search);
-        if (params.has('user')) currentUserId = params.get('user');
+        if (params.has('user')) {
+            currentUserId = params.get('user');
+        }
+
+        // ============================================================
+        // PROXY LIST — dicoba satu per satu sampai berhasil
+        // ============================================================
+        const PROXIES = [
+            'https://users.roproxy.com',
+            'https://friends.roproxy.com',
+        ];
+
+        // Cari user by username menggunakan beberapa endpoint alternatif
+        async function getUserByUsername(username) {
+            // Metode 1: POST ke roproxy
+            try {
+                const res = await fetch('https://users.roproxy.com/v1/usernames/users', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ usernames: [username], excludeBannedUsers: false })
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.data && data.data.length > 0) return data.data[0];
+                }
+            } catch(e) { console.warn('Proxy 1 gagal:', e); }
+
+            // Metode 2: GET user by username (endpoint berbeda)
+            try {
+                const res = await fetch(`https://users.roproxy.com/v1/users/search?keyword=${encodeURIComponent(username)}&limit=10`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.data && data.data.length > 0) {
+                        // Cari yang exact match
+                        const exact = data.data.find(u => u.name.toLowerCase() === username.toLowerCase());
+                        if (exact) return exact;
+                        return data.data[0];
+                    }
+                }
+            } catch(e) { console.warn('Proxy 2 gagal:', e); }
+
+            // Metode 3: allorigins.win sebagai CORS bypass fallback
+            try {
+                const target = encodeURIComponent(`https://api.roblox.com/users/get-by-username?username=${username}`);
+                const res = await fetch(`https://api.allorigins.win/get?url=${target}`);
+                if (res.ok) {
+                    const wrapper = await res.json();
+                    const data = JSON.parse(wrapper.contents);
+                    if (data && data.Id) return { id: data.Id, name: data.Username, displayName: data.Username };
+                }
+            } catch(e) { console.warn('Proxy 3 gagal:', e); }
+
+            return null;
+        }
+
+        async function getFollowerCount(userId) {
+            // Coba roproxy dulu
+            try {
+                const res = await fetch(`https://friends.roproxy.com/v1/users/${userId}/followers/count`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (typeof data.count === 'number') return data.count;
+                }
+            } catch(e) {}
+
+            // Fallback: allorigins
+            try {
+                const target = encodeURIComponent(`https://friends.roblox.com/v1/users/${userId}/followers/count`);
+                const res = await fetch(`https://api.allorigins.win/get?url=${target}`);
+                if (res.ok) {
+                    const wrapper = await res.json();
+                    const data = JSON.parse(wrapper.contents);
+                    if (typeof data.count === 'number') return data.count;
+                }
+            } catch(e) {}
+
+            return null;
+        }
+
+        async function getAvatar(userId) {
+            try {
+                const res = await fetch(`https://thumbnails.roproxy.com/v1/users/avatar-headshot?userIds=${userId}&size=150x150&format=Png&isCircular=true`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.data && data.data[0]) return data.data[0].imageUrl;
+                }
+            } catch(e) {}
+            return null;
+        }
 
         async function searchUser() {
             const username = document.getElementById('usernameInput').value.trim();
             if (!username) return;
 
-            const btn = document.querySelector('.btn-go');
-            btn.innerText = "Mencari...";
+            const btn = document.getElementById('btn-go');
+            const errEl = document.getElementById('modal-error');
+            btn.textContent = 'Mencari...';
+            btn.disabled = true;
+            errEl.textContent = '';
 
             try {
-                // Menggunakan RoProxy untuk mencari ID
-                const response = await fetch(`https://users.roproxy.com/v1/usernames/users`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ usernames: [username], excludeBannedUsers: true })
-                });
-                const data = await response.json();
-
-                if (data.data && data.data.length > 0) {
-                    currentUserId = data.data[0].id;
+                const user = await getUserByUsername(username);
+                if (user && user.id) {
+                    currentUserId = user.id;
                     window.history.pushState({}, null, `?user=${currentUserId}`);
                     closeSearch();
-                    loadTracker();
+                    loadTracker(user);
                 } else {
-                    alert("User tidak ditemukan!");
+                    errEl.textContent = '❌ User tidak ditemukan. Coba periksa ejaan username.';
                 }
             } catch (err) {
-                alert("Error mencari user.");
+                errEl.textContent = '❌ Terjadi error koneksi. Coba lagi.';
+                console.error(err);
             } finally {
-                btn.innerText = "CARI SEKARANG";
+                btn.textContent = 'CARI SEKARANG';
+                btn.disabled = false;
             }
         }
 
-        async function loadTracker() {
+        async function loadTracker(preloadedUser = null) {
             if (refreshInterval) clearInterval(refreshInterval);
+            if (!currentUserId) return;
+
+            document.getElementById('status-msg').textContent = '';
 
             try {
-                // Ambil info profil & Avatar
-                const userRes = await fetch(`https://users.roproxy.com/v1/users/${currentUserId}`);
-                const userData = await userRes.json();
-                
-                document.getElementById('title-text').innerHTML = userData.displayName;
+                let userData = preloadedUser;
+
+                // Kalau belum ada data user (load dari URL params), ambil dulu
+                if (!userData) {
+                    const res = await fetch(`https://users.roproxy.com/v1/users/${currentUserId}`);
+                    if (!res.ok) throw new Error('Gagal ambil profil');
+                    userData = await res.json();
+                }
+
+                // Set nama & link profil
+                document.getElementById('title-text').textContent = userData.displayName || userData.name;
                 document.getElementById('title-text').href = `https://www.roblox.com/users/${userData.id}/profile`;
 
-                const avRes = await fetch(`https://thumbnails.roproxy.com/v1/users/avatar-headshot?userIds=${currentUserId}&size=150x150&format=Png&isCircular=true`);
-                const avData = await avRes.json();
-                document.getElementById('thumbnail').src = avData.data[0].imageUrl;
+                // Ambil avatar
+                const avatarUrl = await getAvatar(currentUserId);
+                if (avatarUrl) document.getElementById('thumbnail').src = avatarUrl;
 
-                // Loop Real-time update follower
-                updateCount();
-                refreshInterval = setInterval(updateCount, 2000);
+                // Mulai update follower
+                await updateCount();
+                refreshInterval = setInterval(updateCount, 3000);
 
             } catch (err) {
-                console.warn("Gagal memuat data tracker.");
+                console.error('Gagal loadTracker:', err);
+                document.getElementById('status-msg').textContent = '⚠️ Gagal memuat profil. Coba refresh halaman.';
             }
         }
 
         async function updateCount() {
-            try {
-                const response = await fetch(`https://friends.roproxy.com/v1/users/${currentUserId}/followers/count`);
-                const data = await response.json();
-                document.getElementById('odometer').innerHTML = data.count;
-            } catch (err) {
-                console.error("Gagal update angka.");
+            const count = await getFollowerCount(currentUserId);
+            if (count !== null) {
+                document.getElementById('odometer').innerHTML = count;
+                document.getElementById('status-msg').textContent = '';
+            } else {
+                document.getElementById('status-msg').textContent = '⚠️ Gagal update angka.';
             }
         }
 
         // Jalankan saat pertama load
-        loadTracker();
+        if (currentUserId) {
+            loadTracker();
+        } else {
+            // Default: tampilkan Roblox user ID 1 (Roblox official)
+            currentUserId = '1';
+            loadTracker();
+        }
     </script>
 </body>
 </html>
