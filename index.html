@@ -1,18 +1,17 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Live Roblox Follower Count</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/odometer.js/0.4.7/themes/odometer-theme-default.min.css">
     <style>
-        :root { --bg: #0f0f13; --accent: #0084ff; --card: #1a1a20; }
-        * { box-sizing: border-box; }
+        :root { --bg: #0f0f13; --accent: #0084ff; --card: #1a1a20; --green: #4caf50; --red: #ff5252; --orange: #f0a500; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            margin: 0;
-            background-color: var(--bg);
+            background: var(--bg);
             color: white;
             font-family: 'Plus Jakarta Sans', sans-serif;
             display: flex;
@@ -21,493 +20,604 @@
             min-height: 100vh;
         }
 
-        .navigation-bar {
+        /* NAV */
+        nav {
             width: 100%;
-            height: 70px;
+            height: 64px;
             background: #000;
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 0 5%;
-            border-bottom: 1px solid #333;
+            border-bottom: 1px solid #222;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .logo { font-weight: 800; font-size: 1.15rem; color: white; text-decoration: none; letter-spacing: -0.5px; }
+        .btn-search {
+            display: flex; align-items: center; gap: 7px;
+            background: var(--accent); padding: 8px 16px; border-radius: 10px;
+            font-weight: 700; font-size: 0.88rem; cursor: pointer; border: none; color: white;
+            transition: opacity .15s;
+        }
+        .btn-search:hover { opacity: .82; }
+
+        /* MAIN */
+        .main {
+            flex: 1; display: flex; justify-content: center; align-items: center;
+            width: 100%; padding: 24px 16px;
         }
 
-        .logo { font-weight: 800; font-size: 1.2rem; color: white; text-decoration: none; }
-
-        .search-trigger {
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: var(--accent);
-            padding: 8px 16px;
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            transition: opacity 0.2s;
-        }
-        .search-trigger:hover { opacity: 0.85; }
-
-        .main-container {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            padding: 20px;
-        }
-
-        .counter-card {
+        .card {
             background: var(--card);
-            padding: 40px 20px;
-            border-radius: 30px;
-            width: 100%;
-            max-width: 500px;
+            border-radius: 28px;
+            width: 100%; max-width: 520px;
+            padding: 36px 24px 28px;
             text-align: center;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-            border: 1px solid rgba(255,255,255,0.05);
+            box-shadow: 0 24px 48px rgba(0,0,0,.55);
+            border: 1px solid rgba(255,255,255,.05);
         }
 
         #thumbnail {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            border: 3px solid var(--accent);
-            margin-bottom: 15px;
-            object-fit: cover;
-            transition: opacity 0.3s;
+            width: 110px; height: 110px;
+            border-radius: 50%; border: 3px solid var(--accent);
+            object-fit: cover; margin-bottom: 14px;
         }
 
-        #title-text {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin: 10px 0;
-            display: block;
-            color: white;
-            text-decoration: none;
+        #display-name {
+            font-size: 1.45rem; font-weight: 800; color: white;
+            text-decoration: none; display: block; margin-bottom: 4px;
         }
-        #title-text:hover { text-decoration: underline; }
+        #display-name:hover { text-decoration: underline; }
 
-        #username-sub {
-            font-size: 0.9rem;
-            color: #888;
-            margin: 0 0 5px;
-        }
+        #username-tag { font-size: .88rem; color: #666; margin-bottom: 4px; }
+        #user-id-tag  { font-size: .78rem; color: #444; margin-bottom: 2px; }
 
-        #status-msg {
-            font-size: 0.82rem;
-            min-height: 20px;
-            margin: 4px 0;
-            transition: color 0.3s;
+        #status-dot {
+            font-size: .78rem; font-weight: 600; letter-spacing: 1px;
+            margin: 8px 0 2px; min-height: 18px;
         }
 
         .odometer {
-            font-size: 5rem;
-            font-weight: 800;
-            margin: 20px 0;
-            display: block;
-            color: white;
+            font-size: 4.6rem; font-weight: 800;
+            margin: 16px 0 6px; display: block; color: white;
         }
 
-        @media (max-width: 600px) {
-            .odometer { font-size: 15vw; }
+        .label { color: #555; letter-spacing: 3px; font-size: .72rem; font-weight: 700; }
+
+        /* STATS STRIP */
+        .stats {
+            display: flex; justify-content: space-around;
+            margin-top: 22px; padding-top: 18px;
+            border-top: 1px solid rgba(255,255,255,.06);
+            gap: 8px;
+        }
+        .stat-box { flex: 1; }
+        .stat-val { font-size: 1.05rem; font-weight: 800; }
+        .stat-lbl { font-size: .68rem; color: #555; font-weight: 600; letter-spacing: 1px; margin-top: 2px; }
+
+        /* ACTIVITY LOG */
+        .log-section {
+            margin-top: 20px; padding-top: 16px;
+            border-top: 1px solid rgba(255,255,255,.06);
+            text-align: left;
+        }
+        .log-title { font-size: .72rem; letter-spacing: 2px; font-weight: 700; color: #555; margin-bottom: 10px; }
+        .log-list { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+        .log-item {
+            font-size: .8rem; color: #aaa;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 5px 10px; border-radius: 8px; background: rgba(255,255,255,.03);
+        }
+        .log-item .badge {
+            font-size: .68rem; font-weight: 700; padding: 2px 8px;
+            border-radius: 20px; margin-left: 8px; white-space: nowrap;
+        }
+        .badge-follow   { background: rgba(76,175,80,.15);  color: var(--green); }
+        .badge-unfollow { background: rgba(255,82,82,.15);  color: var(--red);   }
+
+        /* RESPONSIVE */
+        @media (max-width: 480px) {
+            .odometer { font-size: 14vw; }
             #thumbnail { width: 90px; height: 90px; }
-            #title-text { font-size: 1.2rem; }
+            #display-name { font-size: 1.2rem; }
         }
 
-        #search-modal {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.88);
-            backdrop-filter: blur(12px);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
+        /* MODAL */
+        #modal {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,.88);
+            backdrop-filter: blur(14px);
+            display: none; justify-content: center; align-items: center;
+            z-index: 999;
         }
-
-        .modal-content {
-            background: #1c1c22;
-            padding: 32px;
-            border-radius: 20px;
-            width: 90%;
-            max-width: 400px;
-            text-align: center;
-            border: 1px solid rgba(255,255,255,0.08);
+        .modal-box {
+            background: #18181e; border-radius: 20px; padding: 30px 28px;
+            width: 90%; max-width: 380px; text-align: center;
+            border: 1px solid rgba(255,255,255,.08);
         }
-
-        .modal-content h2 { margin-top: 0; font-size: 1.4rem; }
-
-        .modal-content input {
-            width: 100%;
-            padding: 14px 16px;
-            background: #111;
-            border: 1px solid #444;
-            border-radius: 10px;
-            color: white;
-            font-size: 1rem;
-            margin-bottom: 8px;
-            outline: none;
-            transition: border-color 0.2s;
+        .modal-box h2 { font-size: 1.25rem; margin-bottom: 18px; }
+        .modal-input {
+            width: 100%; padding: 13px 15px; background: #0e0e12;
+            border: 1px solid #333; border-radius: 10px; color: white;
+            font-size: 1rem; outline: none; transition: border-color .2s; margin-bottom: 8px;
+            font-family: inherit;
         }
-        .modal-content input:focus { border-color: var(--accent); }
-
-        #modal-error {
-            color: #ff6b6b;
-            font-size: 0.83rem;
-            min-height: 22px;
-            margin-bottom: 10px;
+        .modal-input:focus { border-color: var(--accent); }
+        #modal-err { color: #ff6b6b; font-size: .82rem; min-height: 20px; margin-bottom: 10px; }
+        .modal-btn {
+            width: 100%; padding: 12px; border-radius: 10px; border: none;
+            font-weight: 700; font-size: .95rem; cursor: pointer; transition: opacity .15s;
+            font-family: inherit;
         }
-
-        .modal-content button {
-            width: 100%;
-            padding: 13px;
-            border-radius: 10px;
-            border: none;
-            font-weight: 700;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: opacity 0.2s;
-        }
-        .modal-content button:hover:not(:disabled) { opacity: 0.85; }
-        .modal-content button:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        .btn-go { background: var(--accent); color: white; margin-bottom: 10px; }
-        .btn-close { background: #3a3a3a; color: white; }
+        .modal-btn:hover:not(:disabled) { opacity: .82; }
+        .modal-btn:disabled { opacity: .45; cursor: not-allowed; }
+        .btn-primary { background: var(--accent); color: white; margin-bottom: 8px; }
+        .btn-secondary { background: #2e2e38; color: #bbb; }
 
         .spinner {
-            display: inline-block;
-            width: 14px; height: 14px;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-top-color: white;
-            border-radius: 50%;
-            animation: spin 0.7s linear infinite;
-            vertical-align: middle;
-            margin-right: 6px;
+            display: inline-block; width: 13px; height: 13px;
+            border: 2px solid rgba(255,255,255,.25); border-top-color: #fff;
+            border-radius: 50%; animation: spin .65s linear infinite;
+            vertical-align: middle; margin-right: 5px;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Loading overlay */
+        #loading-overlay {
+            position: absolute; inset: 0; background: rgba(26,26,32,.9);
+            border-radius: 28px; display: none;
+            justify-content: center; align-items: center;
+            flex-direction: column; gap: 12px; z-index: 10;
+        }
+        .card { position: relative; }
+        #loading-text { font-size: .85rem; color: #888; }
     </style>
 </head>
 <body>
 
-<nav class="navigation-bar">
+<nav>
     <a href="#" class="logo">RobloxLive</a>
-    <div class="search-trigger" onclick="openSearch()">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M10 16a6 6 0 1 0 0-12 6 6 0 0 0 0 12Zm11.707 4.293-5.38-5.38a8 8 0 1 0-1.414 1.414l5.38 5.38a1 1 0 0 0 1.414-1.414Z"/></svg>
-        Cari
-    </div>
+    <button class="btn-search" onclick="openModal()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M10 16a6 6 0 1 0 0-12 6 6 0 0 0 0 12Zm11.707 4.293-5.38-5.38a8 8 0 1 0-1.414 1.414l5.38 5.38a1 1 0 0 0 1.414-1.414Z"/></svg>
+        Cari User
+    </button>
 </nav>
 
-<div class="main-container">
-    <div class="counter-card">
-        <img id="thumbnail" src="https://placehold.co/120x120/1a1a20/0084ff?text=..." alt="thumbnail">
-        <a id="title-text" target="_blank" href="#">Memuat...</a>
-        <p id="username-sub"></p>
-        <div id="status-msg" style="color:#888">Menghubungkan...</div>
+<div class="main">
+    <div class="card">
+
+        <!-- Loading Overlay -->
+        <div id="loading-overlay">
+            <div class="spinner" style="width:28px;height:28px;border-width:3px;"></div>
+            <div id="loading-text">Memuat...</div>
+        </div>
+
+        <img id="thumbnail" src="https://placehold.co/110x110/1a1a20/333?text=..." alt="avatar">
+        <a id="display-name" href="#" target="_blank">—</a>
+        <div id="username-tag"></div>
+        <div id="user-id-tag"></div>
+        <div id="status-dot" style="color:#555">● Menghubungkan...</div>
+
         <div class="odometer" id="odometer">0</div>
-        <p style="color:#888;letter-spacing:2px;font-size:0.8rem;font-weight:600;margin:0">FOLLOWERS</p>
+        <div class="label">FOLLOWERS</div>
+
+        <!-- Stats -->
+        <div class="stats">
+            <div class="stat-box">
+                <div class="stat-val" id="stat-awal">—</div>
+                <div class="stat-lbl">AWAL SESSION</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-val" id="stat-baru" style="color:var(--green)">+0</div>
+                <div class="stat-lbl">BARU</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-val" id="stat-durasi">00:00</div>
+                <div class="stat-lbl">DURASI</div>
+            </div>
+        </div>
+
+        <!-- Activity Log -->
+        <div class="log-section">
+            <div class="log-title">AKTIVITAS TERBARU</div>
+            <ul class="log-list" id="log-list">
+                <li class="log-item" style="color:#444;justify-content:center">Belum ada aktivitas</li>
+            </ul>
+        </div>
+
     </div>
 </div>
 
-<div id="search-modal">
-    <div class="modal-content">
-        <h2>🔍 Cari Username Roblox</h2>
-        <input type="text" id="usernameInput" placeholder="Masukkan username..." autocomplete="off"
-            onkeydown="if(event.key==='Enter') searchUser()">
-        <div id="modal-error"></div>
-        <button class="btn-go" id="btn-go" onclick="searchUser()">CARI SEKARANG</button>
-        <button class="btn-close" onclick="closeSearch()">BATAL</button>
+<!-- MODAL -->
+<div id="modal">
+    <div class="modal-box">
+        <h2>🔍 Cari User Roblox</h2>
+        <input class="modal-input" id="modal-input"
+               placeholder="Username atau User ID..."
+               autocomplete="off"
+               onkeydown="if(event.key==='Enter') doSearch()">
+        <div id="modal-err"></div>
+        <button class="modal-btn btn-primary" id="modal-btn" onclick="doSearch()">CARI SEKARANG</button>
+        <button class="modal-btn btn-secondary" onclick="closeModal()">BATAL</button>
     </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/odometer.js/0.4.7/odometer.min.js"></script>
 <script>
+// ─── Config ───────────────────────────────────────────────────────────────────
 window.odometerOptions = { format: 'd', duration: 1500 };
 
-let currentUserId = null;
-let refreshInterval = null;
-let lastKnownCount = 0;
+const CORSPROXY = 'https://corsproxy.io/?';
+const ALLORIGINS_RAW = 'https://api.allorigins.win/raw?url=';
+const ALLORIGINS_GET = 'https://api.allorigins.win/get?url=';
 
-function openSearch() {
-    document.getElementById('search-modal').style.display = 'flex';
-    document.getElementById('modal-error').textContent = '';
-    document.getElementById('usernameInput').value = '';
-    setTimeout(() => document.getElementById('usernameInput').focus(), 100);
-}
-function closeSearch() {
-    document.getElementById('search-modal').style.display = 'none';
-}
+// Encode URL untuk proxy
+const p  = url => CORSPROXY    + encodeURIComponent(url);
+const ao = url => ALLORIGINS_RAW + encodeURIComponent(url);
 
-function setStatus(msg, color = '#888') {
-    const el = document.getElementById('status-msg');
-    el.style.color = color;
-    el.textContent = msg;
-}
+// ─── State ────────────────────────────────────────────────────────────────────
+let userId      = null;
+let sessionStart = null;
+let initialCount = null;
+let lastCount    = null;
+let newFollowers = 0;
+let activityLog  = [];       // max 8 entri terbaru
+let pollTimer    = null;
+let durTimer     = null;
 
-// Fetch dengan auto-timeout agar tidak hang
-function fetchTimeout(url, options = {}, ms = 8000) {
-    const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), ms);
-    return fetch(url, { ...options, signal: ctrl.signal }).finally(() => clearTimeout(timer));
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+function ft(url, opts = {}, ms = 9000) {
+    const c = new AbortController();
+    const t = setTimeout(() => c.abort(), ms);
+    return fetch(url, { ...opts, signal: c.signal }).finally(() => clearTimeout(t));
 }
 
-// ── 7 strategi cari user by username ─────────────────────────────────────────
-async function getUserByUsername(username) {
-    const lc = username.toLowerCase();
+async function tryJSON(url, opts) {
+    try {
+        const r = await ft(url, opts);
+        if (!r.ok) return null;
+        return await r.json();
+    } catch { return null; }
+}
 
-    const strategies = [
-        // 1. roproxy POST
+function fmt(n) { return Number(n).toLocaleString('id-ID'); }
+function now()  { return new Date().toTimeString().slice(0,8); }
+
+// ─── CORE: getUserInfo — sama persis logika Python ────────────────────────────
+// Python: kalau input digit → GET /v1/users/{id}
+//         kalau bukan digit → POST /v1/usernames/users → GET /v1/users/{id}
+
+async function getUserInfo(input) {
+    const trimmed = input.trim();
+    const isId    = /^\d+$/.test(trimmed);
+
+    if (isId) {
+        // ── Path 1: input adalah User ID langsung ──────────────────────────
+        return await fetchUserById(trimmed);
+    } else {
+        // ── Path 2: input adalah username → cari ID dulu ───────────────────
+        const uid = await resolveUsernameToId(trimmed);
+        if (!uid) return null;
+        return await fetchUserById(uid);
+    }
+}
+
+// POST /v1/usernames/users  ← sama persis yang Python lakukan
+async function resolveUsernameToId(username) {
+    const ENDPOINT = 'https://users.roblox.com/v1/usernames/users';
+    const BODY = JSON.stringify({ usernames: [username], excludeBannedUsers: false });
+    const OPTS = { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: BODY };
+
+    // Urutan proxy: corsproxy.io → allorigins → roproxy → thingproxy
+    const proxies = [
+        // 1. corsproxy.io (paling reliable untuk POST)
         async () => {
-            const r = await fetchTimeout('https://users.roproxy.com/v1/usernames/users', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ usernames: [username], excludeBannedUsers: false })
-            });
-            if (!r.ok) return null;
-            const d = await r.json();
-            const u = d.data?.find(x => x.name.toLowerCase() === lc);
-            return u ? { id: u.id, name: u.name, displayName: u.displayName || u.name } : null;
+            const d = await tryJSON(p(ENDPOINT), OPTS);
+            return d?.data?.[0]?.id ?? null;
         },
-
-        // 2. roproxy GET search
+        // 2. roproxy (native support roblox)
         async () => {
-            const r = await fetchTimeout(`https://users.roproxy.com/v1/users/search?keyword=${encodeURIComponent(username)}&limit=10`);
-            if (!r.ok) return null;
-            const d = await r.json();
-            const u = d.data?.find(x => x.name.toLowerCase() === lc) || d.data?.[0];
-            return u ? { id: u.id, name: u.name, displayName: u.displayName || u.name } : null;
+            const d = await tryJSON('https://users.roproxy.com/v1/usernames/users', OPTS);
+            return d?.data?.[0]?.id ?? null;
         },
-
-        // 3. corsproxy.io POST
+        // 3. allorigins raw (support POST)
         async () => {
-            const r = await fetchTimeout(`https://corsproxy.io/?${encodeURIComponent('https://users.roblox.com/v1/usernames/users')}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ usernames: [username], excludeBannedUsers: false })
-            });
-            if (!r.ok) return null;
-            const d = await r.json();
-            const u = d.data?.find(x => x.name.toLowerCase() === lc);
-            return u ? { id: u.id, name: u.name, displayName: u.displayName || u.name } : null;
+            const d = await tryJSON(ao(ENDPOINT), OPTS);
+            return d?.data?.[0]?.id ?? null;
         },
-
-        // 4. allorigins raw POST
+        // 4. thingproxy
         async () => {
-            const r = await fetchTimeout(
-                `https://api.allorigins.win/raw?url=${encodeURIComponent('https://users.roblox.com/v1/usernames/users')}`,
-                {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ usernames: [username], excludeBannedUsers: false })
-                }
-            );
-            if (!r.ok) return null;
-            const d = await r.json();
-            const u = d.data?.find(x => x.name.toLowerCase() === lc);
-            return u ? { id: u.id, name: u.name, displayName: u.displayName || u.name } : null;
+            const d = await tryJSON('https://thingproxy.freeboard.io/fetch/' + ENDPOINT, OPTS);
+            return d?.data?.[0]?.id ?? null;
         },
-
-        // 5. allorigins GET (Roblox API lama)
+        // 5. allorigins GET (API lama, GET-only fallback)
         async () => {
             const url = `https://api.roblox.com/users/get-by-username?username=${encodeURIComponent(username)}`;
-            const r = await fetchTimeout(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`);
-            if (!r.ok) return null;
-            const wrap = await r.json();
-            const d = JSON.parse(wrap.contents);
-            if (!d?.Id) return null;
-            return { id: d.Id, name: d.Username, displayName: d.Username };
+            const w = await tryJSON(ALLORIGINS_GET + encodeURIComponent(url));
+            if (!w?.contents) return null;
+            const d = JSON.parse(w.contents);
+            return d?.Id ?? null;
         },
-
-        // 6. thingproxy POST
+        // 6. roproxy search (fallback kalau endpoint POST gagal)
         async () => {
-            const r = await fetchTimeout('https://thingproxy.freeboard.io/fetch/https://users.roblox.com/v1/usernames/users', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ usernames: [username], excludeBannedUsers: false })
-            });
-            if (!r.ok) return null;
-            const d = await r.json();
-            const u = d.data?.find(x => x.name.toLowerCase() === lc);
-            return u ? { id: u.id, name: u.name, displayName: u.displayName || u.name } : null;
-        },
-
-        // 7. htmldriven cors-proxy
-        async () => {
-            const r = await fetchTimeout(`https://cors-proxy.htmldriven.com/?url=${encodeURIComponent('https://users.roblox.com/v1/usernames/users')}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ usernames: [username], excludeBannedUsers: false })
-            });
-            if (!r.ok) return null;
-            const d = await r.json();
-            const u = d.data?.find(x => x.name.toLowerCase() === lc);
-            return u ? { id: u.id, name: u.name, displayName: u.displayName || u.name } : null;
+            const d = await tryJSON(`https://users.roproxy.com/v1/users/search?keyword=${encodeURIComponent(username)}&limit=10`);
+            const match = d?.data?.find(u => u.name.toLowerCase() === username.toLowerCase());
+            return match?.id ?? d?.data?.[0]?.id ?? null;
         },
     ];
 
-    for (let i = 0; i < strategies.length; i++) {
+    for (let i = 0; i < proxies.length; i++) {
         try {
-            setStatus(`Mencoba metode ${i + 1}/${strategies.length}...`, '#aaa');
-            const result = await strategies[i]();
-            if (result) { console.log(`✅ Strategy ${i+1} berhasil`); return result; }
-        } catch (e) {
-            console.warn(`Strategy ${i+1} gagal:`, e.message);
-        }
+            setLoadingText(`Mencari username (proxy ${i+1}/${proxies.length})...`);
+            const id = await proxies[i]();
+            if (id) { console.log(`✅ resolveUsername via proxy ${i+1}`); return String(id); }
+        } catch(e) { console.warn(`proxy ${i+1} fail:`, e.message); }
     }
     return null;
 }
 
-// ── Follower count dengan 4 proxy ─────────────────────────────────────────────
-async function getFollowerCount(userId) {
+// GET /v1/users/{id}
+async function fetchUserById(id) {
+    const ENDPOINT = `https://users.roblox.com/v1/users/${id}`;
+
     const sources = [
-        () => fetchTimeout(`https://friends.roproxy.com/v1/users/${userId}/followers/count`),
-        () => fetchTimeout(`https://corsproxy.io/?${encodeURIComponent(`https://friends.roblox.com/v1/users/${userId}/followers/count`)}`),
-        () => fetchTimeout(`https://api.allorigins.win/raw?url=${encodeURIComponent(`https://friends.roblox.com/v1/users/${userId}/followers/count`)}`),
-        () => fetchTimeout(`https://thingproxy.freeboard.io/fetch/https://friends.roblox.com/v1/users/${userId}/followers/count`),
+        () => tryJSON(p(ENDPOINT)),
+        () => tryJSON(`https://users.roproxy.com/v1/users/${id}`),
+        () => tryJSON(ao(ENDPOINT)),
+    ];
+
+    for (const src of sources) {
+        try {
+            const d = await src();
+            if (d?.id || d?.name) {
+                return {
+                    id:          String(d.id || id),
+                    username:    d.name        || 'Unknown',
+                    displayName: d.displayName || d.name || 'Unknown',
+                    created:     d.created     || null,
+                };
+            }
+        } catch {}
+    }
+    return null;
+}
+
+// GET /v1/users/{id}/followers/count
+async function getFollowerCount(id) {
+    const ENDPOINT = `https://friends.roblox.com/v1/users/${id}/followers/count`;
+
+    const sources = [
+        () => tryJSON(`https://friends.roproxy.com/v1/users/${id}/followers/count`),
+        () => tryJSON(p(ENDPOINT)),
+        () => tryJSON(ao(ENDPOINT)),
+        () => tryJSON('https://thingproxy.freeboard.io/fetch/' + ENDPOINT),
+    ];
+
+    for (const src of sources) {
+        try {
+            const d = await src();
+            if (typeof d?.count === 'number') return d.count;
+        } catch {}
+    }
+    return null;
+}
+
+// GET avatar
+async function getAvatar(id) {
+    const ENDPOINT = `https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${id}&size=150x150&format=Png&isCircular=true`;
+    const sources = [
+        () => tryJSON(`https://thumbnails.roproxy.com/v1/users/avatar-headshot?userIds=${id}&size=150x150&format=Png&isCircular=true`),
+        () => tryJSON(p(ENDPOINT)),
+        () => tryJSON(ao(ENDPOINT)),
     ];
     for (const src of sources) {
         try {
-            const r = await src();
-            if (!r.ok) continue;
-            const d = await r.json();
-            if (typeof d.count === 'number') return d.count;
-        } catch (e) {}
+            const d = await src();
+            if (d?.data?.[0]?.imageUrl) return d.data[0].imageUrl;
+        } catch {}
     }
     return null;
 }
 
-// ── Avatar ─────────────────────────────────────────────────────────────────────
-async function getAvatar(userId) {
-    const sources = [
-        `https://thumbnails.roproxy.com/v1/users/avatar-headshot?userIds=${userId}&size=150x150&format=Png&isCircular=true`,
-        `https://corsproxy.io/?${encodeURIComponent(`https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${userId}&size=150x150&format=Png&isCircular=true`)}`,
-        `https://api.allorigins.win/raw?url=${encodeURIComponent(`https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${userId}&size=150x150&format=Png&isCircular=true`)}`,
-    ];
-    for (const url of sources) {
-        try {
-            const r = await fetchTimeout(url);
-            if (!r.ok) continue;
-            const d = await r.json();
-            if (d.data?.[0]?.imageUrl) return d.data[0].imageUrl;
-        } catch (e) {}
-    }
-    return null;
+// ─── Modal ────────────────────────────────────────────────────────────────────
+function openModal() {
+    document.getElementById('modal').style.display = 'flex';
+    document.getElementById('modal-err').textContent = '';
+    document.getElementById('modal-input').value = '';
+    setTimeout(() => document.getElementById('modal-input').focus(), 80);
+}
+function closeModal() {
+    document.getElementById('modal').style.display = 'none';
 }
 
-// ── Get user by ID ─────────────────────────────────────────────────────────────
-async function getUserById(userId) {
-    const sources = [
-        `https://users.roproxy.com/v1/users/${userId}`,
-        `https://corsproxy.io/?${encodeURIComponent(`https://users.roblox.com/v1/users/${userId}`)}`,
-        `https://api.allorigins.win/raw?url=${encodeURIComponent(`https://users.roblox.com/v1/users/${userId}`)}`,
-    ];
-    for (const url of sources) {
-        try {
-            const r = await fetchTimeout(url);
-            if (!r.ok) continue;
-            return await r.json();
-        } catch (e) {}
-    }
-    return null;
-}
+async function doSearch() {
+    const val = document.getElementById('modal-input').value.trim();
+    if (!val) { document.getElementById('modal-err').textContent = '⚠️ Masukkan username atau User ID!'; return; }
 
-// ── searchUser: dipanggil tombol Cari ────────────────────────────────────────
-async function searchUser() {
-    const input = document.getElementById('usernameInput');
-    const username = input.value.trim();
-    if (!username) {
-        document.getElementById('modal-error').textContent = '⚠️ Masukkan username dulu!';
-        return;
-    }
-
-    const btn = document.getElementById('btn-go');
-    const errEl = document.getElementById('modal-error');
+    const btn = document.getElementById('modal-btn');
+    const err = document.getElementById('modal-err');
     btn.innerHTML = '<span class="spinner"></span>Mencari...';
     btn.disabled = true;
-    errEl.textContent = '';
+    err.textContent = '';
 
     try {
-        const user = await getUserByUsername(username);
-        if (user) {
-            currentUserId = String(user.id);
-            window.history.pushState({}, null, `?user=${currentUserId}`);
-            closeSearch();
-            await loadTracker(user);
+        showLoading('Mencari user...');
+        const info = await getUserInfo(val);
+
+        if (info) {
+            closeModal();
+            await startTracker(info);
         } else {
-            errEl.textContent = `❌ "${username}" tidak ditemukan. Cek ejaan atau coba lagi.`;
+            hideLoading();
+            err.textContent = `❌ "${val}" tidak ditemukan. Cek ejaan atau pastikan akun ada.`;
         }
-    } catch (err) {
-        errEl.textContent = '❌ Error koneksi. Coba beberapa detik lagi.';
-        console.error(err);
+    } catch(e) {
+        hideLoading();
+        err.textContent = '❌ Error koneksi. Coba lagi.';
+        console.error(e);
     } finally {
         btn.textContent = 'CARI SEKARANG';
         btn.disabled = false;
     }
 }
 
-// ── loadTracker: set UI profil + mulai polling ────────────────────────────────
-async function loadTracker(preloadedUser = null) {
-    if (refreshInterval) { clearInterval(refreshInterval); refreshInterval = null; }
+// ─── Loading overlay ─────────────────────────────────────────────────────────
+function showLoading(msg = 'Memuat...') {
+    document.getElementById('loading-text').textContent = msg;
+    document.getElementById('loading-overlay').style.display = 'flex';
+}
+function setLoadingText(msg) {
+    document.getElementById('loading-text').textContent = msg;
+}
+function hideLoading() {
+    document.getElementById('loading-overlay').style.display = 'none';
+}
 
-    // Reset UI dulu
+// ─── Tracker ─────────────────────────────────────────────────────────────────
+async function startTracker(userInfo) {
+    // Stop polling lama
+    if (pollTimer) clearInterval(pollTimer);
+    if (durTimer)  clearInterval(durTimer);
+
+    // Reset state
+    userId       = userInfo.id;
+    sessionStart = new Date();
+    initialCount = null;
+    lastCount    = null;
+    newFollowers = 0;
+    activityLog  = [];
+
+    // Reset UI
     document.getElementById('odometer').innerHTML = 0;
-    lastKnownCount = 0;
-    document.getElementById('title-text').textContent = 'Memuat...';
-    document.getElementById('title-text').href = '#';
-    document.getElementById('username-sub').textContent = '';
-    document.getElementById('thumbnail').src = 'https://placehold.co/120x120/1a1a20/0084ff?text=...';
-    setStatus('Menghubungkan...', '#888');
+    document.getElementById('stat-awal').textContent = '—';
+    document.getElementById('stat-baru').textContent = '+0';
+    document.getElementById('stat-durasi').textContent = '00:00';
+    document.getElementById('log-list').innerHTML = '<li class="log-item" style="color:#444;justify-content:center">Belum ada aktivitas</li>';
 
-    try {
-        let userData = preloadedUser;
-        if (!userData) {
-            userData = await getUserById(currentUserId);
-            if (!userData) throw new Error('Profil tidak ditemukan');
-        }
+    // Tampilkan profil
+    document.getElementById('display-name').textContent = userInfo.displayName;
+    document.getElementById('display-name').href = `https://www.roblox.com/users/${userInfo.id}/profile`;
 
-        const displayName = userData.displayName || userData.name;
-        const username = userData.name;
-
-        document.getElementById('title-text').textContent = displayName;
-        document.getElementById('title-text').href = `https://www.roblox.com/users/${userData.id}/profile`;
-
-        if (displayName !== username) {
-            document.getElementById('username-sub').textContent = `@${username}`;
-        }
-
-        // Avatar (async, tidak blocking UI)
-        getAvatar(currentUserId).then(url => {
-            if (url) document.getElementById('thumbnail').src = url;
-        });
-
-        // Mulai polling
-        await updateCount();
-        refreshInterval = setInterval(updateCount, 4000);
-
-    } catch (err) {
-        console.error('loadTracker error:', err);
-        setStatus('⚠️ Gagal memuat profil. Coba lagi.', '#ff6b6b');
-    }
-}
-
-// ── Update angka follower ─────────────────────────────────────────────────────
-async function updateCount() {
-    const count = await getFollowerCount(currentUserId);
-    if (count !== null) {
-        if (count !== lastKnownCount) {
-            document.getElementById('odometer').innerHTML = count;
-            lastKnownCount = count;
-        }
-        setStatus('● Live', '#4caf50');
+    if (userInfo.displayName !== userInfo.username) {
+        document.getElementById('username-tag').textContent = `@${userInfo.username}`;
     } else {
-        setStatus('⚠️ Gagal update, mencoba lagi...', '#f0a500');
+        document.getElementById('username-tag').textContent = '';
     }
+    document.getElementById('user-id-tag').textContent = `ID: ${userInfo.id}`;
+
+    // Avatar async
+    getAvatar(userInfo.id).then(url => {
+        if (url) document.getElementById('thumbnail').src = url;
+    });
+
+    // Ambil count pertama
+    setLoadingText('Mengambil jumlah follower...');
+    const first = await getFollowerCount(userInfo.id);
+    hideLoading();
+
+    if (first === null) {
+        setStatus('⚠️ Gagal ambil follower', '#f0a500');
+        return;
+    }
+
+    initialCount = first;
+    lastCount    = first;
+    document.getElementById('odometer').innerHTML = first;
+    document.getElementById('stat-awal').textContent = fmt(first);
+    setStatus('● Live', '#4caf50');
+
+    // Timer durasi
+    durTimer = setInterval(updateDuration, 1000);
+
+    // Polling setiap 3 detik (lebih cepat dari versi lama)
+    pollTimer = setInterval(pollCount, 3000);
+
+    // Update URL
+    window.history.pushState({}, '', `?user=${userInfo.id}`);
 }
 
-// ── Init ───────────────────────────────────────────────────────────────────────
-const params = new URLSearchParams(window.location.search);
-currentUserId = params.get('user') || '1';
-loadTracker();
+async function pollCount() {
+    const count = await getFollowerCount(userId);
+    if (count === null) { setStatus('⚠️ Retry...', '#f0a500'); return; }
+
+    setStatus('● Live', '#4caf50');
+
+    if (count === lastCount) return;
+
+    const diff = count - lastCount;
+    const ts   = now();
+
+    if (diff > 0) {
+        newFollowers += diff;
+        for (let i = 0; i < Math.min(diff, 5); i++) {
+            addLog('follow', lastCount + i + 1, ts);
+        }
+    } else {
+        for (let i = 0; i < Math.min(Math.abs(diff), 5); i++) {
+            addLog('unfollow', lastCount - i, ts);
+        }
+    }
+
+    lastCount = count;
+    document.getElementById('odometer').innerHTML = count;
+    document.getElementById('stat-baru').textContent = `+${newFollowers}`;
+}
+
+function addLog(type, num, ts) {
+    activityLog.unshift({ type, num, ts });
+    if (activityLog.length > 8) activityLog.pop();
+    renderLog();
+}
+
+function renderLog() {
+    const ul = document.getElementById('log-list');
+    if (!activityLog.length) {
+        ul.innerHTML = '<li class="log-item" style="color:#444;justify-content:center">Belum ada aktivitas</li>';
+        return;
+    }
+    ul.innerHTML = activityLog.map(e => `
+        <li class="log-item">
+            <span>#${fmt(e.num)}</span>
+            <span style="display:flex;align-items:center;gap:6px">
+                <span style="color:#555;font-size:.72rem">${e.ts}</span>
+                <span class="badge ${e.type === 'follow' ? 'badge-follow' : 'badge-unfollow'}">
+                    ${e.type === 'follow' ? '+ Follow' : '− Unfollow'}
+                </span>
+            </span>
+        </li>
+    `).join('');
+}
+
+function updateDuration() {
+    if (!sessionStart) return;
+    const s = Math.floor((Date.now() - sessionStart) / 1000);
+    const m = Math.floor(s / 60), sec = s % 60;
+    const h = Math.floor(m / 60), min = m % 60;
+    document.getElementById('stat-durasi').textContent = h > 0
+        ? `${h}:${String(min).padStart(2,'0')}:${String(sec).padStart(2,'0')}`
+        : `${String(min).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+}
+
+function setStatus(msg, color) {
+    const el = document.getElementById('status-dot');
+    el.textContent = msg; el.style.color = color;
+}
+
+// ─── Init ─────────────────────────────────────────────────────────────────────
+(async () => {
+    const p = new URLSearchParams(location.search);
+    const u = p.get('user') || '1';
+    showLoading('Memuat profil...');
+    const info = await getUserInfo(u);
+    if (info) {
+        await startTracker(info);
+    } else {
+        hideLoading();
+        setStatus('⚠️ Gagal load. Klik Cari User.', '#f0a500');
+    }
+})();
 </script>
 </body>
 </html>
