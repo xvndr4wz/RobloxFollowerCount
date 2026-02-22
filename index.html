@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Roblox Follower Counter</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/odometer.js/0.4.7/themes/odometer-theme-minimal.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #050505;
+            --card: #111111;
+            --accent: #0084ff;
+            --text-main: #ffffff;
+            --text-dim: #a0a0a0;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        /* Background Glow */
+        .glow {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: var(--accent);
+            filter: blur(150px);
+            opacity: 0.2;
+            z-index: -1;
+        }
+
+        .container {
+            background: var(--card);
+            padding: 3rem;
+            border-radius: 32px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .avatar-wrapper {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 1.5rem;
+        }
+
+        #avatar-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: #222;
+            border: 3px solid var(--accent);
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .live-dot {
+            position: absolute;
+            bottom: 5px;
+            right: 10px;
+            width: 15px;
+            height: 15px;
+            background: #00ff88;
+            border-radius: 50%;
+            border: 3px solid var(--card);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); opacity: 0.7; }
+            70% { transform: scale(1.1); opacity: 1; box-shadow: 0 0 0 10px rgba(0, 255, 136, 0); }
+            100% { transform: scale(0.95); opacity: 0.7; }
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .username-link {
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 1rem;
+            opacity: 0.8;
+            transition: 0.3s;
+        }
+
+        .username-link:hover { opacity: 1; text-decoration: underline; }
+
+        /* Odometer Style */
+        .odometer {
+            font-size: 5rem;
+            font-weight: 800;
+            margin: 1.5rem 0;
+            display: block;
+            color: var(--text-main);
+        }
+
+        .label {
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .search-btn {
+            margin-top: 2rem;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .search-btn:hover {
+            background: white;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="glow"></div>
+
+    <div class="container">
+        <div class="avatar-wrapper">
+            <img id="avatar-img" src="https://tr.rbxcdn.com/38cda1368297750824b2049e63e72151/150/150/AvatarHeadshot/Png" alt="Avatar">
+            <div class="live-dot"></div>
+        </div>
+
+        <h1 id="display-name">Loading...</h1>
+        <a id="username-link" href="#" target="_blank" class="username-link">@username</a>
+
+        <div id="odometer" class="odometer">0</div>
+        <div class="label">Followers</div>
+
+        <button class="search-btn" onclick="searchUser()">Change User</button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/odometer.js/0.4.7/odometer.min.js"></script>
+
+    <script>
+        let currentUserId = "1"; // Default (Roblox)
+        let refreshInterval;
+
+        // Cek URL Params
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('user')) {
+            currentUserId = urlParams.get('user');
+        }
+
+        // Fungsi Cari User
+        async function searchUser() {
+            const username = prompt("Masukkan Username Roblox:");
+            if (!username) return;
+
+            try {
+                const res = await fetch(`https://users.roproxy.com/v1/users/search?keyword=${username}&limit=1`);
+                const data = await res.json();
+                
+                if (data.data && data.data.length > 0) {
+                    currentUserId = data.data[0].id;
+                    // Update URL tanpa reload
+                    window.history.pushState({}, '', `?user=${currentUserId}`);
+                    initTracker();
+                } else {
+                    alert("User tidak ditemukan!");
+                }
+            } catch (err) {
+                alert("Terjadi kesalahan saat mencari user.");
+            }
+        }
+
+        async function initTracker() {
+            if (refreshInterval) clearInterval(refreshInterval);
+
+            try {
+                // 1. Ambil Data Profil
+                const userRes = await fetch(`https://users.roproxy.com/v1/users/${currentUserId}`);
+                const userData = await userRes.json();
+                
+                document.getElementById('display-name').innerText = userData.displayName;
+                document.getElementById('username-link').innerText = `@${userData.name}`;
+                document.getElementById('username-link').href = `https://www.roblox.com/users/${userData.id}/profile`;
+
+                // 2. Ambil Avatar
+                const avRes = await fetch(`https://thumbnails.roproxy.com/v1/users/avatar-headshot?userIds=${currentUserId}&size=150x150&format=Png&isCircular=true`);
+                const avData = await avRes.json();
+                if(avData.data && avData.data[0]) {
+                    document.getElementById('avatar-img').src = avData.data[0].imageUrl;
+                }
+
+                // 3. Loop Follower
+                fetchFollowers();
+                refreshInterval = setInterval(fetchFollowers, 3000);
+
+            } catch (err) {
+                console.error("Gagal inisialisasi:", err);
+            }
+        }
+
+        async function fetchFollowers() {
+            try {
+                const res = await fetch(`https://friends.roproxy.com/v1/users/${currentUserId}/followers/count`);
+                const data = await res.json();
+                document.getElementById('odometer').innerHTML = data.count;
+            } catch (err) {
+                console.warn("Gagal update follower");
+            }
+        }
+
+        // Jalankan saat pertama buka
+        initTracker();
+    </script>
+</body>
+</html>
